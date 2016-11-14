@@ -1,0 +1,23 @@
+{
+	"Log": {
+		"File": "log/history_opt_service.log",
+		"Level": "debug",
+		"Name": "history_opt_service",
+		"Suffix": "060102-15"
+	},
+	
+	"Prog": {
+		"CPU": 0,
+		"Daemon": false,
+		"HealthPort": "localhost:6061"
+	},
+	
+	"Server": {
+		"Redis": "tcp://127.0.0.1:6379/0?timeout=60s&maxidle=10",
+		"Mysql":"mysql://root:@tcp(10.133.157.137:3306)/publish",
+		"PortInfo":"0.0.0.0:9053",
+		"AuthUrl": "http://10.133.157.137:15000/publish/account/authenticate",
+		"AuthCheckTimeout": 3
+	}
+}
+
