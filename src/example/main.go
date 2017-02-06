@@ -2,6 +2,7 @@
 package main
 
 import (
+	"example/app"
 	"fmt"
 	"time"
 
@@ -10,19 +11,17 @@ import (
 
 	"common/libutil"
 	"common/logging"
-	"publish/history_opt/app"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/drone/routes"
 )
 
 //注册http回调
 func registerHttpHandle() {
-	//http.HandleFunc("/msmart/query/getDeviceidBySn", app.HandleGetDeviceidBySn)
-	mux := routes.New()
-	mux.Get("/publish/history/opt/", app.HandleHistoryOptQuery)
-	mux.Post("/publish/history/opt/:user_id", app.HandleHistoryOptCreate)
-	http.Handle("/", mux)	
+	http.HandleFunc("/test", app.HandleTest)
+	//mux := routes.New()
+	//mux.Get("/publish/history/opt/", app.HandleHistoryOptQuery)
+	//mux.Post("/publish/history/opt/:user_id", app.HandleHistoryOptCreate)
+	//http.Handle("/", mux)
 }
 
 func main() {

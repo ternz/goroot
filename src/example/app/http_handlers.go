@@ -1,25 +1,25 @@
 package app
 
 import (
-	"strconv"
-	"time"
 	"common/logging"
 	"net/http"
+	"strconv"
+	"time"
 )
 
 func HandleHistoryOptQuery(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	//w.Header().Add("Access-Control-Allow-Origin", "*")
-	
+
 	logging.Debug("request: %+v", r)
-	
+
 	session := r.Header.Get("X-Auth-Token")
 	if session == "" {
 		logging.Warning("parameter session is null")
 		http.Error(w, ERR_STR_NULL_SESSION, http.StatusUnauthorized)
 		return
 	}
-	
+
 	user_id, err := CheckSession(session)
 	if err != nil {
 		logging.Error("check session error: %s", err.Error())
@@ -30,7 +30,7 @@ func HandleHistoryOptQuery(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	
+
 	var mintime, maxtime uint64
 	var page, size int
 	params := r.URL.Query()
@@ -66,18 +66,18 @@ func HandleHistoryOptQuery(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	
+
 	list, total, err := DbQueryHistoryOpt(user_id, mintime, maxtime, page, size)
 	if err != nil {
 		logging.Error("db error: %s", err.Error())
 		http.Error(w, ERR_STR_INTERNAL_SERVER, http.StatusInternalServerError)
 		return
 	}
-	
-	for i,_ := range list {
+
+	for i, _ := range list {
 		list[i].CreateTimeStr = formatDate(int64(list[i].CreateTime))
 	}
-	
+
 	resp := make(map[string]interface{})
 	resp["total"] = total
 	resp["history_opt_list"] = list
@@ -87,9 +87,9 @@ func HandleHistoryOptQuery(w http.ResponseWriter, r *http.Request) {
 func HandleHistoryOptCreate(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	w.Header().Add("Access-Control-Allow-Origin", "*")
-	
+
 	logging.Debug("request: %+v", r)
-	
+
 	urlpara := r.URL.Query()
 	user_id := urlpara.Get(":user_id")
 	if user_id == "" {
@@ -97,7 +97,7 @@ func HandleHistoryOptCreate(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "parameter user_id is null", http.StatusBadRequest)
 		return
 	}
-	
+
 	bodypara := make(map[string]string)
 	ParsePostJsonBody(r.Body, &bodypara)
 	content := bodypara["content"]
@@ -106,20 +106,26 @@ func HandleHistoryOptCreate(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "parameter content is null", http.StatusBadRequest)
 		return
 	}
-	
+
 	h := &HistoryOpt{
-		UserId: user_id,
-		Content: content,
+		UserId:     user_id,
+		Content:    content,
 		CreateTime: uint64(time.Now().Unix()),
 	}
-	
+
 	err := DbCreateHistoryOpt(h)
 	if err != nil {
 		logging.Error("db error: %s", err.Error())
 		http.Error(w, ERR_STR_INTERNAL_SERVER, http.StatusInternalServerError)
 		return
 	}
-	
+
 	logging.Debug("response OK")
 	w.Write(nil)
+}
+
+func HandleTest(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	logging.Info("handle test")
+	w.Write([]byte("test ok"))
 }
